@@ -1,15 +1,19 @@
 import { useEffect, useRef } from 'react';
 
-const COUNT = 150;
-const CONNECT_DIST = 150;
+const COUNT = 60;
+const CONNECT_DIST = 180;
 const ATTRACT_RADIUS = 200;
 const REPEL_RADIUS = 80;
 const MAX_FORCE = 0.3;
+const FPS_LIMIT = 33;
+const PARTICLE_SIZE = 4;
 
 export default function ParticleField({ className = '' }) {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const particlesRef = useRef([]);
+  const lastTimeRef = useRef(0);
+  const frameCountRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,27 +49,39 @@ export default function ParticleField({ className = '' }) {
 
     let opacity = 0;
 
-    const animate = () => {
+    const animate = (timestamp) => {
+      const elapsed = timestamp - lastTimeRef.current;
+      if (elapsed < FPS_LIMIT) {
+        animId = requestAnimationFrame(animate);
+        return;
+      }
+      lastTimeRef.current = timestamp;
+      frameCountRef.current++;
+
       opacity = Math.min(1, opacity + 0.02);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
+      const updateMouse = frameCountRef.current % 2 === 0;
 
       for (let i = 0; i < COUNT; i++) {
         const pt = p[i];
-        const dx = mx - pt.x;
-        const dy = my - pt.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < ATTRACT_RADIUS && dist > 0) {
-          const force = Math.min(MAX_FORCE, (ATTRACT_RADIUS - dist) / ATTRACT_RADIUS * 0.5);
-          if (dist < REPEL_RADIUS) {
-            pt.vx -= (dx / dist) * force * 2;
-            pt.vy -= (dy / dist) * force * 2;
-          } else {
-            pt.vx += (dx / dist) * force;
-            pt.vy += (dy / dist) * force;
+        if (updateMouse) {
+          const dx = mx - pt.x;
+          const dy = my - pt.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < ATTRACT_RADIUS && dist > 0) {
+            const force = Math.min(MAX_FORCE, (ATTRACT_RADIUS - dist) / ATTRACT_RADIUS * 0.5);
+            if (dist < REPEL_RADIUS) {
+              pt.vx -= (dx / dist) * force * 2;
+              pt.vy -= (dy / dist) * force * 2;
+            } else {
+              pt.vx += (dx / dist) * force;
+              pt.vy += (dy / dist) * force;
+            }
           }
         }
 
@@ -82,22 +98,20 @@ export default function ParticleField({ className = '' }) {
 
       for (let i = 0; i < COUNT; i++) {
         const pt = p[i];
-        const gradient = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 4);
-        gradient.addColorStop(0, 'rgba(0, 240, 255, 0.9)');
-        gradient.addColorStop(0.5, 'rgba(168, 85, 247, 0.5)');
-        gradient.addColorStop(1, 'rgba(168, 85, 247, 0)');
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
-        ctx.fill();
+        const half = PARTICLE_SIZE / 2;
+
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.9)';
+        ctx.fillRect(pt.x - half, pt.y - half, PARTICLE_SIZE, PARTICLE_SIZE);
 
         for (let j = i + 1; j < COUNT; j++) {
           const pt2 = p[j];
           const dx = pt.x - pt2.x;
           const dy = pt.y - pt2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < CONNECT_DIST) {
-            const alpha = (1 - dist / CONNECT_DIST) * 0.5 * opacity;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < CONNECT_DIST * CONNECT_DIST) {
+            const alpha = (1 - Math.sqrt(distSq) / CONNECT_DIST) * 0.5 * opacity;
+            if (alpha < 0.1) continue;
             ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
@@ -109,7 +123,7 @@ export default function ParticleField({ className = '' }) {
       }
       animId = requestAnimationFrame(animate);
     };
-    animate();
+    animId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animId);

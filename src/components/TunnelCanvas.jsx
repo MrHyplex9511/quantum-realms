@@ -1,11 +1,19 @@
 import { useEffect, useRef } from 'react';
+import useInView from '../hooks/useInView';
 
-const PARTICLE_COUNT = 20;
+const PARTICLE_COUNT = 12;
 
 export default function TunnelCanvas({ className = '', height = '400px' }) {
+  const [viewRef, inView] = useInView(0.1);
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
   const timeRef = useRef(0);
+  const inViewRef = useRef(true);
+  const lastFrameRef = useRef(0);
+
+  useEffect(() => {
+    inViewRef.current = inView;
+  }, [inView]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,7 +51,16 @@ export default function TunnelCanvas({ className = '', height = '400px' }) {
     }
     particlesRef.current = p;
 
-    const animate = () => {
+    const animate = (now) => {
+      animId = requestAnimationFrame(animate);
+
+      // FPS cap at 30
+      const elapsed = now - lastFrameRef.current;
+      if (elapsed < 33) return;
+      lastFrameRef.current = now;
+
+      if (!inViewRef.current) return;
+
       timeRef.current += 0.02;
       const t = timeRef.current;
       const w = canvas.width;
@@ -92,7 +109,7 @@ export default function TunnelCanvas({ className = '', height = '400px' }) {
       }
       ctx.stroke();
 
-      // Particles
+      // Particles — simplified glow with fillRect
       for (const pt of p) {
         pt.x += pt.speed;
         pt.phase += 0.05;
@@ -114,13 +131,13 @@ export default function TunnelCanvas({ className = '', height = '400px' }) {
 
         const glow = pt.tunneled ? '0, 240, 255' : pt.reflected ? '168, 85, 247' : '0, 240, 255';
         const size = pt.tunneled ? 3 + Math.sin(pt.phase) : 2;
-        const grd = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, size * 3);
-        grd.addColorStop(0, `rgba(${glow}, ${pt.tunneled ? 0.9 : 0.7})`);
-        grd.addColorStop(1, `rgba(${glow}, 0)`);
-        ctx.fillStyle = grd;
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, size * 3, 0, Math.PI * 2);
-        ctx.fill();
+
+        // fillRect glow (cheaper than radialGradient)
+        const alpha = pt.tunneled ? 0.9 : 0.7;
+        ctx.fillStyle = `rgba(${glow}, ${alpha})`;
+        ctx.fillRect(pt.x - size, pt.y - size, size * 2, size * 2);
+        ctx.fillStyle = `rgba(${glow}, ${alpha * 0.3})`;
+        ctx.fillRect(pt.x - size * 2, pt.y - size * 2, size * 4, size * 4);
       }
 
       // Labels
@@ -129,10 +146,8 @@ export default function TunnelCanvas({ className = '', height = '400px' }) {
       ctx.fillText('incident particles', 8 * dpr, 16 * dpr);
       ctx.fillText('reflected', barrierX - 70 * dpr, barrierY + barrierH + 20 * dpr);
       ctx.fillText('tunneled', barrierX + barrierW + 8 * dpr, barrierY + barrierH + 20 * dpr);
-
-      animId = requestAnimationFrame(animate);
     };
-    animate();
+    animId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animId);
@@ -141,10 +156,12 @@ export default function TunnelCanvas({ className = '', height = '400px' }) {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={className}
-      style={{ width: '100%', height, display: 'block' }}
-    />
+    <div ref={viewRef} style={{ width: '100%', height }}>
+      <canvas
+        ref={canvasRef}
+        className={className}
+        style={{ width: '100%', height: '100%', display: 'block' }}
+      />
+    </div>
   );
 }

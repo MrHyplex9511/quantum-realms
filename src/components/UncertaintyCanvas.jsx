@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import useInView from '../hooks/useInView';
 
 function gaussian(x, mu, sigma) {
   return Math.exp(-0.5 * ((x - mu) / sigma) ** 2) / (sigma * Math.sqrt(2 * Math.PI));
@@ -9,8 +10,10 @@ function momentumDist(k, sigma) {
 }
 
 export default function UncertaintyCanvas({ className = '', height = '400px' }) {
+  const [viewRef, inView] = useInView(0.1);
   const canvasRef = useRef(null);
   const [width, setWidth] = useState(0.3);
+  const lastFrameRef = useRef(0);
   const animRef = useRef(0);
 
   useEffect(() => {
@@ -31,26 +34,45 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
     resize();
     window.addEventListener('resize', resize);
 
-    const animate = () => {
+    // Offscreen canvas at 1/3 resolution
+    const offCanvas = document.createElement('canvas');
+    const offCtx = offCanvas.getContext('2d');
+
+    const animate = (now) => {
+      animId = requestAnimationFrame(animate);
+
+      // FPS cap at 30
+      const elapsed = now - lastFrameRef.current;
+      if (elapsed < 33) return;
+      lastFrameRef.current = now;
+
+      if (!inView) return;
+
       animRef.current += 0.01;
       const w = canvas.width;
       const h = canvas.height;
       const dpr = window.devicePixelRatio || 1;
 
-      ctx.fillStyle = '#0a0a1a';
-      ctx.fillRect(0, 0, w, h);
+      // Render at 1/3 resolution in both dimensions
+      const dw = Math.ceil(w / 3);
+      const dh = Math.ceil(h / 3);
+      offCanvas.width = dw;
+      offCanvas.height = dh;
+
+      offCtx.fillStyle = '#0a0a1a';
+      offCtx.fillRect(0, 0, dw, dh);
 
       const sigma = 0.05 + width * 0.25;
-      const posH = h * 0.42;
-      const momH = h * 0.42;
-      const posY0 = h * 0.08;
-      const momY0 = h * 0.55;
+      const posH = dh * 0.42;
+      const momH = dh * 0.42;
+      const posY0 = dh * 0.08;
+      const momY0 = dh * 0.55;
 
       // Position space wave packet
-      const cx = w * 0.5;
+      const cx = dw * 0.5;
       const maxPos = gaussian(0, 0, sigma);
-      for (let x = 0; x < w; x++) {
-        const nx = (x - cx) / (w * 0.3);
+      for (let x = 0; x < dw; x++) {
+        const nx = (x - cx) / (dw * 0.3);
         const val = gaussian(nx, 0, sigma);
         const norm = val / maxPos;
         const phase = Math.sin(nx * 20 + animRef.current * 3) * norm * 0.3 + norm * 0.7;
@@ -61,14 +83,14 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
         const g = Math.round(240 * (1 - blend) + 85 * blend);
         const b = Math.round(255 * (1 - blend) + 247 * blend);
 
-        ctx.fillStyle = `rgba(${r},${g},${b},${0.4 + norm * 0.5})`;
-        ctx.fillRect(x, posY0 + posH - barH * phase, 1, barH * phase + 1);
+        offCtx.fillStyle = `rgba(${r},${g},${b},${0.4 + norm * 0.5})`;
+        offCtx.fillRect(x, posY0 + posH - barH * phase, 1, barH * phase + 1);
       }
 
       // Momentum distribution
       const maxMom = momentumDist(0, sigma);
-      for (let x = 0; x < w; x++) {
-        const k = (x - cx) / (w * 0.3) * 10;
+      for (let x = 0; x < dw; x++) {
+        const k = (x - cx) / (dw * 0.3) * 10;
         const val = momentumDist(k, sigma);
         const norm = val / maxMom;
         const barH = norm * momH;
@@ -78,25 +100,28 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
         const g = Math.round(85 * (1 - blend) + 240 * blend);
         const b = Math.round(247 * (1 - blend) + 255 * blend);
 
-        ctx.fillStyle = `rgba(${r},${g},${b},${0.4 + norm * 0.5})`;
-        ctx.fillRect(x, momY0 + momH - barH, 1, barH + 1);
+        offCtx.fillStyle = `rgba(${r},${g},${b},${0.4 + norm * 0.5})`;
+        offCtx.fillRect(x, momY0 + momH - barH, 1, barH + 1);
       }
 
-      // Label
+      // Scale up to main canvas
+      ctx.clearRect(0, 0, w, h);
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(offCanvas, 0, 0, w, h);
+
+      // Labels (render at full res on main canvas)
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
       ctx.font = `${12 * dpr}px monospace`;
-      ctx.fillText('position space', 8 * dpr, posY0 + 14 * dpr);
-      ctx.fillText('momentum space', 8 * dpr, momY0 + 14 * dpr);
-
-      animId = requestAnimationFrame(animate);
+      ctx.fillText('position space', 8 * dpr, posY0 * 3 + 14 * dpr);
+      ctx.fillText('momentum space', 8 * dpr, momY0 * 3 + 14 * dpr);
     };
-    animate();
+    animId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', resize);
     };
-  }, [width]);
+  }, [width, inView]);
 
   const handleClick = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -105,7 +130,7 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
   };
 
   return (
-    <div className={className} style={{ width: '100%', height, position: 'relative' }}>
+    <div ref={viewRef} className={className} style={{ width: '100%', height, position: 'relative' }}>
       <canvas
         ref={canvasRef}
         onClick={handleClick}

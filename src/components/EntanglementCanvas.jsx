@@ -1,13 +1,22 @@
 import { useEffect, useRef } from 'react';
+import useInView from '../hooks/useInView';
 
-const STAR_COUNT = 100;
+const STAR_COUNT = 60;
 
 export default function EntanglementCanvas({ className = '' }) {
+  const [viewRef, inView] = useInView(0.1);
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const starsRef = useRef([]);
   const energyRef = useRef([]);
   const timeRef = useRef(0);
+  const inViewRef = useRef(true);
+  const lastFrameRef = useRef(0);
+  const frameCountRef = useRef(0);
+
+  useEffect(() => {
+    inViewRef.current = inView;
+  }, [inView]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -22,7 +31,13 @@ export default function EntanglementCanvas({ className = '' }) {
     resize();
     window.addEventListener('resize', resize);
 
-    const onMouse = (e) => { mouseRef.current.x = e.clientX; mouseRef.current.y = e.clientY; };
+    let mouseTick = 0;
+    const onMouse = (e) => {
+      mouseTick++;
+      if (mouseTick % 2 !== 0) return;
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
+    };
     window.addEventListener('mousemove', onMouse);
 
     const s = [];
@@ -37,7 +52,16 @@ export default function EntanglementCanvas({ className = '' }) {
     }
     energyRef.current = e;
 
-    const animate = () => {
+    const animate = (now) => {
+      animId = requestAnimationFrame(animate);
+
+      // FPS cap at 30
+      const elapsed = now - lastFrameRef.current;
+      if (elapsed < 33) return;
+      lastFrameRef.current = now;
+
+      if (!inViewRef.current) return;
+
       timeRef.current += 0.016;
       const t = timeRef.current;
       const w = canvas.width;
@@ -109,10 +133,8 @@ export default function EntanglementCanvas({ className = '' }) {
       ctx.beginPath();
       ctx.arc(o2x, o2y, 20, 0, Math.PI * 2);
       ctx.fill();
-
-      animId = requestAnimationFrame(animate);
     };
-    animate();
+    animId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animId);
@@ -122,10 +144,12 @@ export default function EntanglementCanvas({ className = '' }) {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={className}
-      style={{ width: '100%', height: '100%', display: 'block' }}
-    />
+    <div ref={viewRef} style={{ width: '100%', height: '100%' }}>
+      <canvas
+        ref={canvasRef}
+        className={className}
+        style={{ width: '100%', height: '100%', display: 'block' }}
+      />
+    </div>
   );
 }

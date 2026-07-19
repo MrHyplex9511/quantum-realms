@@ -1,12 +1,21 @@
 import { useEffect, useRef } from 'react';
+import useInView from '../hooks/useInView';
 
-const GRID_SIZE = 20;
+const GRID_SIZE = 30;
 
 export default function QuantumFieldCanvas({ className = '', height = '400px' }) {
+  const [viewRef, inView] = useInView(0.1);
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const timeRef = useRef(0);
   const ripplesRef = useRef([]);
+  const inViewRef = useRef(true);
+  const lastFrameRef = useRef(0);
+  const lastRippleRef = useRef(0);
+
+  useEffect(() => {
+    inViewRef.current = inView;
+  }, [inView]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -27,6 +36,10 @@ export default function QuantumFieldCanvas({ className = '', height = '400px' })
     window.addEventListener('resize', resize);
 
     const onMouse = (e) => {
+      const now = performance.now();
+      if (now - lastRippleRef.current < 100) return;
+      lastRippleRef.current = now;
+
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
         x: (e.clientX - rect.left) * window.devicePixelRatio,
@@ -36,7 +49,16 @@ export default function QuantumFieldCanvas({ className = '', height = '400px' })
     };
     canvas.addEventListener('mousemove', onMouse);
 
-    const animate = () => {
+    const animate = (now) => {
+      animId = requestAnimationFrame(animate);
+
+      // FPS cap at 30
+      const elapsed = now - lastFrameRef.current;
+      if (elapsed < 33) return;
+      lastFrameRef.current = now;
+
+      if (!inViewRef.current) return;
+
       timeRef.current += 0.025;
       const t = timeRef.current;
       const w = canvas.width;
@@ -82,10 +104,8 @@ export default function QuantumFieldCanvas({ className = '', height = '400px' })
           ctx.fill();
         }
       }
-
-      animId = requestAnimationFrame(animate);
     };
-    animate();
+    animId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animId);
@@ -95,10 +115,12 @@ export default function QuantumFieldCanvas({ className = '', height = '400px' })
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={className}
-      style={{ width: '100%', height, display: 'block' }}
-    />
+    <div ref={viewRef} style={{ width: '100%', height }}>
+      <canvas
+        ref={canvasRef}
+        className={className}
+        style={{ width: '100%', height, display: 'block' }}
+      />
+    </div>
   );
 }
