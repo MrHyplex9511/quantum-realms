@@ -29,6 +29,7 @@ const GradientBlinds = ({
   spotlightRadius = 0.3,
   spotlightSoftness = 1,
   spotlightOpacity = 0.3,
+  followMouse = true,
   mixBlendMode = 'screen',
   paused = false,
 }) => {
@@ -216,15 +217,18 @@ void main() {
     const ro = new ResizeObserver(resize);
     ro.observe(container);
 
+    let centerNorm = [0.5, 0.5];
     const onPointerMove = e => {
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = 1 - (e.clientY - rect.top) / rect.height;
       mouseTargetRef.current = [x, y];
+      centerNorm = [x, y];
     };
     canvas.addEventListener('pointermove', onPointerMove);
 
     let animTime = 0;
+    let currentAngle = angle;
     const loop = () => {
       rafRef.current = requestAnimationFrame(loop);
       if (paused) return;
@@ -236,11 +240,22 @@ void main() {
 
       uniforms.iTime.value = animTime;
 
-      // Smooth mouse tracking
+      // Smooth mouse tracking for spotlight
       const target = mouseTargetRef.current;
       const cur = uniforms.iMouse.value;
       cur[0] += (target[0] - cur[0]) * 0.08;
       cur[1] += (target[1] - cur[1]) * 0.08;
+
+      // Blind angle follows cursor direction
+      if (followMouse) {
+        const dx = centerNorm[0] - 0.5;
+        const dy = centerNorm[1] - 0.5;
+        if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
+          const targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
+          currentAngle += (targetAngle - currentAngle) * 0.05;
+        }
+        uniforms.uAngle.value = currentAngle;
+      }
 
       if (programRef.current && meshRef.current) {
         renderer.render({ scene: meshRef.current });
@@ -259,7 +274,7 @@ void main() {
       rendererRef.current = null;
       renderer.destroy?.();
     };
-  }, [gradientColors, angle, noise, blindCount, distortAmount, spotlightRadius, spotlightSoftness, spotlightOpacity, paused]);
+  }, [gradientColors, angle, noise, blindCount, distortAmount, spotlightRadius, spotlightSoftness, spotlightOpacity, paused, followMouse]);
 
   return (
     <div

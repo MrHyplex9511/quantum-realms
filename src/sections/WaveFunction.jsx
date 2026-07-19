@@ -109,10 +109,8 @@ export default function WaveFunction() {
           gradientColors={['#ffffff', '#222222', '#555555', '#222222']}
           noise={0.05}
           blindCount={16}
-          spotlightRadius={0.4}
-          spotlightSoftness={1.2}
-          spotlightOpacity={0.25}
-          mixBlendMode="screen"
+          spotlightOpacity={0}
+          followMouse={true}
         />
       )}
       <motion.div
