@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
-import Plasma from '../components/reactbits/Plasma'
+import GradientBlinds from '../components/reactbits/GradientBlinds'
 import useInView from '../hooks/useInView'
 
 const keyframesStyle = `
@@ -105,9 +105,15 @@ export default function WaveFunction() {
     <section id="wave-function" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden' }}>
       <style>{keyframesStyle}</style>
       {sectionNear && (
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.15 }}>
-        <Plasma color="#ffffff" speed={0.8} opacity={0.15} />
-      </div>
+        <GradientBlinds
+          gradientColors={['#ffffff', '#222222', '#555555', '#222222']}
+          noise={0.05}
+          blindCount={16}
+          spotlightRadius={0.4}
+          spotlightSoftness={1.2}
+          spotlightOpacity={0.25}
+          mixBlendMode="screen"
+        />
       )}
       <motion.div
         className="section-container"
