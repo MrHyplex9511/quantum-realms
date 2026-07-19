@@ -1,0 +1,18 @@
+.magnet-lines {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+}
+
+.magnet-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.magnet-line {
+  border-radius: 999px;
+  transform-origin: center center;
+  transition: transform 0.15s ease-out;
+}

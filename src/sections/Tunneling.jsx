@@ -13,11 +13,11 @@ const cardStyle = {
 const factStyle = {
   marginTop: 48,
   padding: '20px 24px',
-  background: 'linear-gradient(135deg, rgba(0,240,255,0.1), rgba(34,197,94,0.08))',
+  background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(153,153,153,0.08))',
   borderRadius: 12,
-  borderLeft: '3px solid #34d399',
+  borderLeft: '3px solid #999999',
   fontSize: 15,
-  color: '#86efac',
+  color: '#cccccc',
   lineHeight: 1.6,
   textAlign: 'center',
 }
@@ -32,11 +32,7 @@ export default function Tunneling() {
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.6 }}
       >
-        <AnimatedText
-          className="section-title"
-          delay={0.04}
-          direction="up"
-        >
+        <AnimatedText className="section-title" delay={0.04} direction="up">
           Quantum Tunneling
         </AnimatedText>
         <motion.p
@@ -62,33 +58,21 @@ export default function Tunneling() {
         </motion.div>
 
         <div style={cardStyle}>
-          <QuantumCard
-            title="🌀 How It Works"
-            gradient="cyan"
-            icon="📉"
-          >
+          <QuantumCard title="🌀 How It Works" gradient="cyan" icon="📉">
             The wave function decays exponentially inside a barrier but doesn't
             reach zero. If the barrier is thin enough, some probability leaks
             through. The particle doesn't "dig through" — it appears on the far
             side without ever being inside the barrier.
           </QuantumCard>
 
-          <QuantumCard
-            title="🔬 Real Applications"
-            gradient="purple"
-            icon="⚛️"
-          >
+          <QuantumCard title="🔬 Real Applications" gradient="purple" icon="⚛️">
             Scanning Tunneling Microscopes (STM) image individual atoms by
             measuring the tunneling current between a sharp tip and a surface.
             Nuclear fusion in stars relies on protons tunneling through their
             mutual electrostatic repulsion.
           </QuantumCard>
 
-          <QuantumCard
-            title="💾 Flash Drives"
-            gradient="cyan-purple"
-            icon="💿"
-          >
+          <QuantumCard title="💾 Flash Drives" gradient="cyan-purple" icon="💿">
             USB flash memory and SSD storage use floating-gate transistors where
             electrons tunnel through a thin oxide layer to store data. The layer
             is intentionally thin enough to allow tunneling but thick enough to

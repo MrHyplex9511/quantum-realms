@@ -13,7 +13,7 @@ const SECTIONS = [
 ];
 
 const linkStyle = {
-  color: '#94a3b8',
+  color: '#888888',
   textDecoration: 'none',
   fontSize: 13,
   fontWeight: 500,
@@ -26,8 +26,8 @@ const linkStyle = {
 
 const activeLinkStyle = {
   ...linkStyle,
-  color: '#00f0ff',
-  background: 'rgba(0,240,255,0.1)',
+  color: '#ffffff',
+  background: 'rgba(255,255,255,0.1)',
 };
 
 export default function Navbar({ className = '' }) {
@@ -79,7 +79,7 @@ export default function Navbar({ className = '' }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: scrolled ? 'rgba(10,10,26,0.85)' : 'transparent',
+          background: scrolled ? 'rgba(0,0,0,0.85)' : 'transparent',
           backdropFilter: scrolled ? 'blur(16px)' : 'none',
           WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'none',
           borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
@@ -94,10 +94,10 @@ export default function Navbar({ className = '' }) {
               onClick={() => scrollTo(s.id)}
               style={active === s.id ? activeLinkStyle : linkStyle}
               onMouseEnter={(e) => {
-                if (active !== s.id) e.target.style.color = '#e2e8f0';
+                if (active !== s.id) e.target.style.color = '#cccccc';
               }}
               onMouseLeave={(e) => {
-                if (active !== s.id) e.target.style.color = '#94a3b8';
+                if (active !== s.id) e.target.style.color = '#888888';
               }}
             >
               {s.label}
@@ -112,7 +112,7 @@ export default function Navbar({ className = '' }) {
             display: 'none',
             background: 'none',
             border: 'none',
-            color: '#e2e8f0',
+            color: '#ffffff',
             fontSize: 24,
             cursor: 'pointer',
             padding: 8,
@@ -152,7 +152,7 @@ export default function Navbar({ className = '' }) {
                 right: 0,
                 bottom: 0,
                 width: 280,
-                background: '#0f0f23',
+                background: '#000000',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
                 zIndex: 201,
@@ -168,7 +168,7 @@ export default function Navbar({ className = '' }) {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#94a3b8',
+                  color: '#888888',
                   fontSize: 24,
                   cursor: 'pointer',
                   alignSelf: 'flex-end',
@@ -186,8 +186,8 @@ export default function Navbar({ className = '' }) {
                     fontSize: 15,
                     padding: '12px 16px',
                     textAlign: 'left',
-                    background: active === s.id ? 'rgba(0,240,255,0.08)' : 'transparent',
-                    color: active === s.id ? '#00f0ff' : '#cbd5e1',
+                    background: active === s.id ? 'rgba(255,255,255,0.08)' : 'transparent',
+                    color: active === s.id ? '#ffffff' : '#cccccc',
                     border: 'none',
                     borderRadius: 8,
                   }}

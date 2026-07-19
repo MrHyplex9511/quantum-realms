@@ -1,15 +1,15 @@
 import { motion } from 'framer-motion';
 
 const gradients = {
-  'cyan-purple': 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(168,85,247,0.15))',
-  cyan: 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,240,255,0.05))',
-  purple: 'linear-gradient(135deg, rgba(168,85,247,0.15), rgba(168,85,247,0.05))',
+  'cyan-purple': 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(128,128,128,0.12))',
+  cyan: 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05))',
+  purple: 'linear-gradient(135deg, rgba(128,128,128,0.12), rgba(128,128,128,0.05))',
 };
 
 const borderGradients = {
-  'cyan-purple': 'linear-gradient(135deg, #00f0ff, #a855f7)',
-  cyan: 'linear-gradient(135deg, #00f0ff, #00f0ff)',
-  purple: 'linear-gradient(135deg, #a855f7, #a855f7)',
+  'cyan-purple': 'linear-gradient(135deg, #ffffff, #888888)',
+  cyan: 'linear-gradient(135deg, #ffffff, #ffffff)',
+  purple: 'linear-gradient(135deg, #888888, #888888)',
 };
 
 export default function QuantumCard({ children, title, icon, gradient = 'cyan-purple', className = '' }) {
@@ -27,7 +27,7 @@ export default function QuantumCard({ children, title, icon, gradient = 'cyan-pu
         WebkitBackdropFilter: 'blur(12px)',
         borderRadius: 16,
         padding: '1.5rem',
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid rgba(255,255,255,0.1)',
         position: 'relative',
         overflow: 'hidden',
         cursor: 'default',
@@ -51,11 +51,11 @@ export default function QuantumCard({ children, title, icon, gradient = 'cyan-pu
       />
       {icon && <div style={{ fontSize: 28, marginBottom: 12, lineHeight: 1 }}>{icon}</div>}
       {title && (
-        <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 600, color: '#e2e8f0' }}>
+        <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 600, color: '#ffffff' }}>
           {title}
         </h3>
       )}
-      <div style={{ color: '#94a3b8', fontSize: 14, lineHeight: 1.6 }}>{children}</div>
+      <div style={{ color: '#888888', fontSize: 14, lineHeight: 1.6 }}>{children}</div>
     </motion.div>
   );
 }

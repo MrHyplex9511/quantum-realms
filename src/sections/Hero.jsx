@@ -1,5 +1,6 @@
 import AnimatedText from '../components/AnimatedText';
 import { motion } from 'framer-motion';
+import Strands from '../components/reactbits/Strands';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -61,19 +62,18 @@ const styles = {
     padding: '1rem 2.5rem',
     fontSize: '1.05rem',
     fontWeight: 600,
-    color: '#ffffff',
+    color: '#000000',
     border: 'none',
     borderRadius: '50px',
     cursor: 'pointer',
-    background: 'linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%)',
-    boxShadow: '0 0 20px rgba(0, 212, 255, 0.3)',
+    background: '#ffffff',
   },
   secondaryBtn: {
     padding: '1rem 2.5rem',
     fontSize: '1.05rem',
     fontWeight: 600,
     color: '#ffffff',
-    border: '2px solid rgba(124, 58, 237, 0.6)',
+    border: '2px solid rgba(255, 255, 255, 0.4)',
     borderRadius: '50px',
     cursor: 'pointer',
     background: 'transparent',
@@ -100,6 +100,9 @@ function Hero() {
 
   return (
     <section id="hero" style={styles.section}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.3 }}>
+        <Strands speed={0.5} opacity={0.3} />
+      </div>
       <motion.div
         style={styles.overlay}
         variants={containerVariants}
@@ -108,9 +111,7 @@ function Hero() {
       >
         <motion.div variants={itemVariants} style={{ marginBottom: '1.5rem' }}>
           <h1 style={styles.title}>
-            <AnimatedText>
-              Quantum Realms
-            </AnimatedText>
+            <AnimatedText>Quantum Realms</AnimatedText>
           </h1>
         </motion.div>
 
@@ -125,7 +126,7 @@ function Hero() {
         <motion.div variants={itemVariants} style={styles.buttonGroup}>
           <motion.button
             style={styles.primaryBtn}
-            whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(0, 212, 255, 0.6), 0 0 60px rgba(124, 58, 237, 0.3)' }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => handleScroll('wave-particle')}
           >
@@ -133,7 +134,7 @@ function Hero() {
           </motion.button>
           <motion.button
             style={styles.secondaryBtn}
-            whileHover={{ scale: 1.05, borderColor: 'rgba(124, 58, 237, 1)', boxShadow: '0 0 25px rgba(124, 58, 237, 0.4)' }}
+            whileHover={{ scale: 1.05, borderColor: '#ffffff' }}
             whileTap={{ scale: 0.97 }}
             onClick={() => handleScroll('superposition')}
           >

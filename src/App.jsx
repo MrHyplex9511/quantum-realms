@@ -15,6 +15,8 @@ function App() {
   const { scrollYProgress } = useScroll()
   const scaleY = useSpring(scrollYProgress, { stiffness: 100, damping: 30 })
 
+  const spacer = <div className="section-spacer" />
+
   return (
     <>
       <ParticleField />
@@ -28,7 +30,7 @@ function App() {
           left: 0,
           right: 0,
           height: 3,
-          background: 'linear-gradient(90deg, var(--accent-cyan), var(--accent-purple))',
+          background: 'linear-gradient(90deg, #ffffff, #888888)',
           transformOrigin: '0%',
           scaleX: scaleY,
           zIndex: 1000,
@@ -37,21 +39,21 @@ function App() {
 
       <main>
         <Hero />
-        <div className="section-divider" />
+        {spacer}
         <WaveParticleDuality />
-        <div className="section-divider" />
+        {spacer}
         <Superposition />
-        <div className="section-divider" />
+        {spacer}
         <Entanglement />
-        <div className="section-divider" />
+        {spacer}
         <Uncertainty />
-        <div className="section-divider" />
+        {spacer}
         <Tunneling />
-        <div className="section-divider" />
+        {spacer}
         <QuantumFields />
-        <div className="section-divider" />
+        {spacer}
         <WaveFunction />
-        <div className="section-divider" />
+        {spacer}
       </main>
 
       {/* Footer */}

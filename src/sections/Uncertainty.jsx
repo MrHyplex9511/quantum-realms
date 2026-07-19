@@ -14,9 +14,9 @@ const formulaStyle = {
   textAlign: 'center',
   padding: '32px 24px',
   marginTop: 48,
-  background: 'rgba(15,15,42,0.6)',
+  background: 'rgba(255,255,255,0.03)',
   borderRadius: 16,
-  border: '1px solid rgba(0,240,255,0.15)',
+  border: '1px solid rgba(255,255,255,0.1)',
 }
 
 export default function Uncertainty() {
@@ -29,11 +29,7 @@ export default function Uncertainty() {
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.6 }}
       >
-        <AnimatedText
-          className="section-title"
-          delay={0.04}
-          direction="up"
-        >
+        <AnimatedText className="section-title" delay={0.04} direction="up">
           Uncertainty Principle
         </AnimatedText>
         <motion.p
@@ -59,38 +55,26 @@ export default function Uncertainty() {
           <div style={{ height: 400, position: 'relative' }}>
             <UncertaintyCanvas height="400px" />
           </div>
-          <div style={{ textAlign: 'center', padding: '10px 16px', background: 'rgba(15,15,42,0.4)', fontSize: 12, color: '#64748b' }}>
+          <div style={{ textAlign: 'center', padding: '10px 16px', background: 'rgba(255,255,255,0.03)', fontSize: 12, color: '#666666' }}>
             Drag the slider to see the trade-off — narrow position (top) means broad momentum (bottom)
           </div>
         </motion.div>
 
         <div style={cardStyle}>
-          <QuantumCard
-            title="🔄 The Trade-off"
-            gradient="cyan"
-            icon="⚡"
-          >
+          <QuantumCard title="🔄 The Trade-off" gradient="cyan" icon="⚡">
             Δx·Δp ≥ ℏ/2. Localizing a wave packet (small Δx) requires many
             wavelengths, which means a wide spread of momenta (large Δp). This
             isn't a measurement flaw — it's a mathematical consequence of wave
             behavior.
           </QuantumCard>
 
-          <QuantumCard
-            title="🌊 Everyday Analogy"
-            gradient="purple"
-            icon="💧"
-          >
+          <QuantumCard title="🌊 Everyday Analogy" gradient="purple" icon="💧">
             A short pulse in a pond has a well-defined location but a messy mix
             of ripples (many momenta). A long, smooth wave has a single
             wavelength (precise momentum) but no definite location. Same trade-off.
           </QuantumCard>
 
-          <QuantumCard
-            title="🧠 Not About Measurement"
-            gradient="cyan-purple"
-            icon="🔬"
-          >
+          <QuantumCard title="🧠 Not About Measurement" gradient="cyan-purple" icon="🔬">
             Contrary to popular myth, Heisenberg's principle isn't about your
             detector disturbing the particle. The uncertainty is baked into the
             wave function itself — the particle doesn't even have a simultaneous
@@ -105,10 +89,10 @@ export default function Uncertainty() {
           viewport={{ once: true }}
           transition={{ delay: 0.6, duration: 0.5 }}
         >
-          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 28, color: '#00f0ff', letterSpacing: 2 }}>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 28, color: '#ffffff', letterSpacing: 2 }}>
             Δx · Δp ≥ ℏ / 2
           </span>
-          <p style={{ color: '#94a3b8', fontSize: 13, marginTop: 12 }}>
+          <p style={{ color: '#888888', fontSize: 13, marginTop: 12 }}>
             The product of position uncertainty and momentum uncertainty can never be less than half of ℏ
           </p>
         </motion.div>

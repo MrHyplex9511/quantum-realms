@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import WaveCanvas from '../components/WaveCanvas'
+import LineWaves from '../components/reactbits/LineWaves'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
 
@@ -14,7 +14,7 @@ export default function WaveParticleDuality() {
   return (
     <section id="wave-particle" style={{ position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0, opacity: 0.4 }}>
-        <WaveCanvas height="100%" />
+        <LineWaves brightness={0.15} />
       </div>
       <motion.div
         className="section-container"
@@ -23,11 +23,7 @@ export default function WaveParticleDuality() {
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.6 }}
       >
-        <AnimatedText
-          className="section-title"
-          delay={0.04}
-          direction="up"
-        >
+        <AnimatedText className="section-title" delay={0.04} direction="up">
           Wave-Particle Duality
         </AnimatedText>
         <motion.p
@@ -43,31 +39,19 @@ export default function WaveParticleDuality() {
         </motion.p>
 
         <div style={cardStyle}>
-          <QuantumCard
-            title="🌊 Wave Nature"
-            gradient="cyan"
-            icon="〰️"
-          >
+          <QuantumCard title="🌊 Wave Nature" gradient="cyan" icon="〰️">
             Light exhibits interference and diffraction — hallmarks of wave behavior.
             Shine it through two slits and you get alternating bright and dark bands,
             exactly like water waves.
           </QuantumCard>
 
-          <QuantumCard
-            title="⚡ Particle Nature"
-            gradient="purple"
-            icon="💥"
-          >
+          <QuantumCard title="⚡ Particle Nature" gradient="purple" icon="💥">
             The photoelectric effect proved light comes in discrete packets (photons).
             Einstein showed each photon carries energy E = hf, kicking electrons off
             metal surfaces only above a threshold frequency.
           </QuantumCard>
 
-          <QuantumCard
-            title="🔬 Double-Slit"
-            gradient="cyan-purple"
-            icon="🧪"
-          >
+          <QuantumCard title="🔬 Double-Slit" gradient="cyan-purple" icon="🧪">
             Fire electrons one-by-one through two slits. Over time, an interference
             pattern builds up — each electron interfered with itself. Add a detector
             to see which slit it goes through, and the pattern vanishes.

@@ -1,20 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
-  --bg-primary: #0a0a1a;
-  --bg-secondary: #0f0f2a;
-  --bg-card: rgba(15, 15, 42, 0.6);
-  --text-primary: #e8e8f0;
-  --text-secondary: #9494b8;
-  --accent-cyan: #00f0ff;
-  --accent-purple: #a855f7;
-  --accent-pink: #ec4899;
-  --accent-green: #34d399;
-  --accent-yellow: #fbbf24;
-  --accent-orange: #fb923c;
-  --glow-cyan: rgba(0, 240, 255, 0.15);
-  --glow-purple: rgba(168, 85, 247, 0.15);
-  --border-glow: rgba(0, 240, 255, 0.1);
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --text-primary: #ffffff;
+  --text-secondary: #888888;
+  --accent-cyan: #ffffff;
+  --accent-purple: #888888;
+  --accent-pink: #666666;
+  --accent-green: #999999;
+  --accent-yellow: #cccccc;
+  --accent-orange: #aaaaaa;
+  --glow-cyan: rgba(255, 255, 255, 0.08);
+  --glow-purple: rgba(128, 128, 128, 0.08);
+  --border-glow: rgba(255, 255, 255, 0.08);
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
@@ -81,7 +81,7 @@ a:hover {
 .section-title {
   font-size: clamp(2rem, 5vw, 3.5rem);
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  background: linear-gradient(135deg, #ffffff, #888888);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -110,11 +110,11 @@ a:hover {
   position: absolute;
   inset: -1px;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-cyan));
+  background: linear-gradient(135deg, #ffffff, #888888, #ffffff);
   background-size: 200% 200%;
   animation: glowRotate 4s linear infinite;
   z-index: -1;
-  opacity: 0.5;
+  opacity: 0.3;
 }
 @keyframes glowRotate {
   0% { background-position: 0% 50%; }
@@ -126,11 +126,8 @@ canvas {
   display: block;
 }
 
-/* Section spacer */
-.section-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
-  opacity: 0.3;
-  margin: 0 auto;
-  max-width: 80%;
+/* Section spacer - bigger gap */
+.section-spacer {
+  height: 20vh;
+  width: 100%;
 }
