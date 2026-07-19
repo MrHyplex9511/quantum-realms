@@ -54,7 +54,7 @@ export default function Tunneling() {
           transition={{ delay: 0.4, duration: 0.5 }}
           style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}
         >
-          <TunnelCanvas height="400px" />
+          <TunnelCanvas height="600px" />
         </motion.div>
 
         <div style={cardStyle}>

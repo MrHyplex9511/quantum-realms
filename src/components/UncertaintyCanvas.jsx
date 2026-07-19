@@ -13,8 +13,14 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
   const [viewRef, inView] = useInView(0.1);
   const canvasRef = useRef(null);
   const [width, setWidth] = useState(0.3);
+  const widthRef = useRef(0.3);
   const lastFrameRef = useRef(0);
   const animRef = useRef(0);
+
+  const handleWidthChange = (v) => {
+    setWidth(v);
+    widthRef.current = v;
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -41,7 +47,6 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
     const animate = (now) => {
       animId = requestAnimationFrame(animate);
 
-      // FPS cap at 30
       const elapsed = now - lastFrameRef.current;
       if (elapsed < 33) return;
       lastFrameRef.current = now;
@@ -53,16 +58,17 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
       const h = canvas.height;
       const dpr = window.devicePixelRatio || 1;
 
-      // Render at 1/3 resolution in both dimensions
+      // Render at 1/3 resolution
       const dw = Math.ceil(w / 3);
       const dh = Math.ceil(h / 3);
       offCanvas.width = dw;
       offCanvas.height = dh;
 
-      offCtx.fillStyle = '#0a0a1a';
+      offCtx.fillStyle = '#000000';
       offCtx.fillRect(0, 0, dw, dh);
 
-      const sigma = 0.05 + width * 0.25;
+      // Read width from ref — no effect re-run
+      const sigma = 0.05 + widthRef.current * 0.25;
       const posH = dh * 0.42;
       const momH = dh * 0.42;
       const posY0 = dh * 0.08;
@@ -78,12 +84,8 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
         const phase = Math.sin(nx * 20 + animRef.current * 3) * norm * 0.3 + norm * 0.7;
         const barH = norm * posH;
 
-        const blend = Math.min(1, norm);
-        const r = Math.round(0 * (1 - blend) + 168 * blend);
-        const g = Math.round(240 * (1 - blend) + 85 * blend);
-        const b = Math.round(255 * (1 - blend) + 247 * blend);
-
-        offCtx.fillStyle = `rgba(${r},${g},${b},${0.4 + norm * 0.5})`;
+        const gray = Math.round(60 + norm * 195);
+        offCtx.fillStyle = `rgba(${gray},${gray},${gray},${0.4 + norm * 0.5})`;
         offCtx.fillRect(x, posY0 + posH - barH * phase, 1, barH * phase + 1);
       }
 
@@ -95,12 +97,8 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
         const norm = val / maxMom;
         const barH = norm * momH;
 
-        const blend = Math.min(1, norm);
-        const r = Math.round(168 * (1 - blend) + 0 * blend);
-        const g = Math.round(85 * (1 - blend) + 240 * blend);
-        const b = Math.round(247 * (1 - blend) + 255 * blend);
-
-        offCtx.fillStyle = `rgba(${r},${g},${b},${0.4 + norm * 0.5})`;
+        const gray = Math.round(60 + norm * 195);
+        offCtx.fillStyle = `rgba(${gray},${gray},${gray},${0.4 + norm * 0.5})`;
         offCtx.fillRect(x, momY0 + momH - barH, 1, barH + 1);
       }
 
@@ -109,7 +107,7 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
       ctx.imageSmoothingEnabled = true;
       ctx.drawImage(offCanvas, 0, 0, w, h);
 
-      // Labels (render at full res on main canvas)
+      // Labels
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
       ctx.font = `${12 * dpr}px monospace`;
       ctx.fillText('position space', 8 * dpr, posY0 * 3 + 14 * dpr);
@@ -121,12 +119,12 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', resize);
     };
-  }, [width, inView]);
+  }, [inView]); // ← ONLY inView, NOT width
 
   const handleClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
-    setWidth(Math.max(0.05, Math.min(1, x)));
+    handleWidthChange(Math.max(0.05, Math.min(1, x)));
   };
 
   return (
@@ -144,8 +142,8 @@ export default function UncertaintyCanvas({ className = '', height = '400px' }) 
           max="1"
           step="0.01"
           value={width}
-          onChange={(e) => setWidth(parseFloat(e.target.value))}
-          style={{ flex: 1, accentColor: '#a855f7' }}
+          onChange={(e) => handleWidthChange(parseFloat(e.target.value))}
+          style={{ flex: 1, accentColor: '#ffffff' }}
         />
         <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}>Δx broad</span>
       </div>

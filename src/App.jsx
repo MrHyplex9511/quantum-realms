@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import Navbar from './components/Navbar'
-import ParticleField from './components/ParticleField'
 import Hero from './sections/Hero'
 import WaveParticleDuality from './sections/WaveParticleDuality'
 import Superposition from './sections/Superposition'
@@ -19,7 +18,6 @@ function App() {
 
   return (
     <>
-      <ParticleField />
       <Navbar />
 
       {/* Progress bar */}

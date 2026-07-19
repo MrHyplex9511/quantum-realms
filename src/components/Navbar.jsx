@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SECTIONS = [
@@ -12,28 +12,11 @@ const SECTIONS = [
   { id: 'wave-function', label: 'Wave Function' },
 ];
 
-const linkStyle = {
-  color: '#888888',
-  textDecoration: 'none',
-  fontSize: 13,
-  fontWeight: 500,
-  padding: '6px 12px',
-  borderRadius: 8,
-  transition: 'all 0.2s',
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-};
-
-const activeLinkStyle = {
-  ...linkStyle,
-  color: '#ffffff',
-  background: 'rgba(255,255,255,0.1)',
-};
-
 export default function Navbar({ className = '' }) {
-  const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState('hero');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const hideTimeoutRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -51,9 +34,48 @@ export default function Navbar({ className = '' }) {
       }
       setActive(current);
     };
+
+    const onMouseMove = (e) => {
+      if (e.clientY < 120) {
+        // Near top — show navbar immediately
+        setVisible(true);
+        if (hideTimeoutRef.current) {
+          clearTimeout(hideTimeoutRef.current);
+          hideTimeoutRef.current = null;
+        }
+      } else if (e.clientY > 200) {
+        // Moved away — hide after short delay
+        if (!hideTimeoutRef.current) {
+          hideTimeoutRef.current = setTimeout(() => {
+            setVisible(false);
+            hideTimeoutRef.current = null;
+          }, 300);
+        }
+      }
+    };
+
+    const onMouseLeave = () => {
+      // Mouse left the page — hide
+      setVisible(false);
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('mouseleave', onMouseLeave);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseleave', onMouseLeave);
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    };
   }, []);
+
+  const [scrolled, setScrolled] = useState(false);
 
   const scrollTo = (id) => {
     const el = document.getElementById(id);
@@ -61,13 +83,37 @@ export default function Navbar({ className = '' }) {
     setMenuOpen(false);
   };
 
+  const btnBase = {
+    background: '#000000',
+    border: '1px solid rgba(255,255,255,0.8)',
+    color: '#ffffff',
+    padding: '6px 16px',
+    borderRadius: 20,
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    transition: 'all 0.25s',
+  };
+
+  const btnActive = {
+    ...btnBase,
+    background: '#ffffff',
+    color: '#000000',
+    border: '1px solid #ffffff',
+  };
+
   return (
     <>
       <motion.nav
         className={className}
-        initial={{ y: -80 }}
-        animate={{ y: 0 }}
-        transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+        initial={{ opacity: 0, y: -60 }}
+        animate={{
+          opacity: visible ? 1 : 0,
+          y: visible ? 0 : -60,
+          pointerEvents: visible ? 'auto' : 'none',
+        }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
         style={{
           position: 'fixed',
           top: 0,
@@ -79,25 +125,39 @@ export default function Navbar({ className = '' }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: scrolled ? 'rgba(0,0,0,0.85)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(16px)' : 'none',
-          WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
-          transition: 'all 0.3s',
+          background: scrolled && visible ? 'rgba(0,0,0,0.85)' : 'transparent',
+          backdropFilter: scrolled && visible ? 'blur(16px)' : 'none',
+          WebkitBackdropFilter: scrolled && visible ? 'blur(16px)' : 'none',
+          borderBottom: '1px solid transparent',
+          transition: 'background 0.3s, backdrop-filter 0.3s',
         }}
       >
         {/* Desktop links */}
-        <div style={{ display: 'flex', gap: 2, overflowX: 'auto', scrollbarWidth: 'none' }}>
+        <div
+          style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}
+          onMouseEnter={() => {
+            // Keep visible while hovering buttons
+            if (hideTimeoutRef.current) {
+              clearTimeout(hideTimeoutRef.current);
+              hideTimeoutRef.current = null;
+            }
+            setVisible(true);
+          }}
+        >
           {SECTIONS.map((s) => (
             <button
               key={s.id}
               onClick={() => scrollTo(s.id)}
-              style={active === s.id ? activeLinkStyle : linkStyle}
+              style={active === s.id ? btnActive : btnBase}
               onMouseEnter={(e) => {
-                if (active !== s.id) e.target.style.color = '#cccccc';
+                if (active !== s.id) {
+                  e.target.style.background = 'rgba(255,255,255,0.1)';
+                }
               }}
               onMouseLeave={(e) => {
-                if (active !== s.id) e.target.style.color = '#888888';
+                if (active !== s.id) {
+                  e.target.style.background = '#000000';
+                }
               }}
             >
               {s.label}
@@ -110,12 +170,13 @@ export default function Navbar({ className = '' }) {
           onClick={() => setMenuOpen(true)}
           style={{
             display: 'none',
-            background: 'none',
-            border: 'none',
+            background: '#000000',
+            border: '1px solid rgba(255,255,255,0.8)',
             color: '#ffffff',
-            fontSize: 24,
+            fontSize: 20,
             cursor: 'pointer',
-            padding: 8,
+            padding: '4px 12px',
+            borderRadius: 8,
             position: 'absolute',
             right: 16,
           }}
@@ -159,8 +220,8 @@ export default function Navbar({ className = '' }) {
                 padding: '24px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 4,
-                borderLeft: '1px solid rgba(255,255,255,0.06)',
+                gap: 8,
+                borderLeft: '1px solid rgba(255,255,255,0.1)',
               }}
             >
               <button
@@ -168,7 +229,7 @@ export default function Navbar({ className = '' }) {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#888888',
+                  color: '#ffffff',
                   fontSize: 24,
                   cursor: 'pointer',
                   alignSelf: 'flex-end',
@@ -182,14 +243,14 @@ export default function Navbar({ className = '' }) {
                   key={s.id}
                   onClick={() => scrollTo(s.id)}
                   style={{
-                    ...linkStyle,
+                    ...btnBase,
                     fontSize: 15,
                     padding: '12px 16px',
                     textAlign: 'left',
-                    background: active === s.id ? 'rgba(255,255,255,0.08)' : 'transparent',
-                    color: active === s.id ? '#ffffff' : '#cccccc',
-                    border: 'none',
-                    borderRadius: 8,
+                    border: active === s.id ? '1px solid #ffffff' : '1px solid rgba(255,255,255,0.4)',
+                    background: active === s.id ? '#ffffff' : '#000000',
+                    color: active === s.id ? '#000000' : '#ffffff',
+                    borderRadius: 12,
                   }}
                 >
                   {s.label}
