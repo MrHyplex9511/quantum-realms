@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import UncertaintyCanvas from '../components/UncertaintyCanvas'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
+import useInView from '../hooks/useInView'
 
 const cardStyle = {
   display: 'grid',
@@ -20,8 +21,9 @@ const formulaStyle = {
 }
 
 export default function Uncertainty() {
+  const [sectionRef, sectionNear] = useInView(0, '1000px');
   return (
-    <section id="uncertainty" style={{ position: 'relative', overflow: 'hidden' }}>
+    <section id="uncertainty" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden' }}>
       <motion.div
         className="section-container"
         initial={{ opacity: 0 }}
@@ -53,7 +55,7 @@ export default function Uncertainty() {
           style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}
         >
           <div style={{ height: 400, position: 'relative' }}>
-            <UncertaintyCanvas height="400px" />
+            {sectionNear && <UncertaintyCanvas height="400px" />}
           </div>
           <div style={{ textAlign: 'center', padding: '10px 16px', background: 'rgba(255,255,255,0.03)', fontSize: 12, color: '#666666' }}>
             Drag the slider to see the trade-off — narrow position (top) means broad momentum (bottom)

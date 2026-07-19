@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
 import GradualBlur from '../components/reactbits/GradualBlur'
+import useInView from '../hooks/useInView'
 
 const sphereStyle = {
   width: 120,
@@ -47,6 +48,7 @@ const cardStyle = {
 export default function Superposition() {
   const [boxState, setBoxState] = useState('❓')
   const [clickCount, setClickCount] = useState(0)
+  const [sectionRef, sectionNear] = useInView(0, '1000px')
 
   const handleOpenBox = () => {
     setClickCount((c) => c + 1)
@@ -55,9 +57,9 @@ export default function Superposition() {
   }
 
   return (
-    <section id="superposition" style={{ position: 'relative', overflow: 'hidden' }}>
+    <section id="superposition" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden' }}>
       <style>{keyframesStyle}</style>
-      <GradualBlur position="bottom" height="10rem" strength={3} opacity={0.5} />
+      {sectionNear && <GradualBlur position="bottom" height="10rem" strength={3} opacity={0.5} />}
       <motion.div
         className="section-container"
         initial={{ opacity: 0 }}

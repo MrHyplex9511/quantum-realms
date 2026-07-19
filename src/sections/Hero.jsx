@@ -1,6 +1,7 @@
 import AnimatedText from '../components/AnimatedText';
 import { motion } from 'framer-motion';
 import Strands from '../components/reactbits/Strands';
+import useInView from '../hooks/useInView';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -93,13 +94,15 @@ const styles = {
 };
 
 function Hero() {
+  const [heroRef, heroNear] = useInView(0.1, '1000px');
+
   const handleScroll = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <section id="hero" style={styles.section}>
+    <section id="hero" ref={heroRef} style={styles.section}>
       <div style={{ position: 'absolute', inset: 0, opacity: 0.3 }}>
         <Strands speed={0.5} opacity={0.3} />
       </div>

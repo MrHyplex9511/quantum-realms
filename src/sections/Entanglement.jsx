@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import MagnetLines from '../components/reactbits/MagnetLines'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
+import useInView from '../hooks/useInView'
 
 const cardStyle = {
   display: 'grid',
@@ -23,8 +24,10 @@ const factStyle = {
 }
 
 export default function Entanglement() {
+  const [sectionRef, sectionNear] = useInView(0, '1000px');
   return (
-    <section id="entanglement" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+    <section id="entanglement" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+      {sectionNear && (
       <div style={{
         position: 'absolute', inset: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -32,6 +35,7 @@ export default function Entanglement() {
       }}>
         <MagnetLines rows={12} columns={12} lineColor="#ffffff" lineWidth="2px" lineHeight="50px" />
       </div>
+      )}
       <motion.div
         className="section-container"
         initial={{ opacity: 0 }}

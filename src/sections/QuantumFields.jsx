@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import FloatingLines from '../components/reactbits/FloatingLines'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
+import useInView from '../hooks/useInView'
 
 const cardStyle = {
   display: 'grid',
@@ -23,11 +24,14 @@ const metaphorStyle = {
 }
 
 export default function QuantumFields() {
+  const [sectionRef, sectionNear] = useInView(0, '1000px');
   return (
-    <section id="fields" style={{ position: 'relative', overflow: 'hidden' }}>
+    <section id="fields" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden' }}>
+      {sectionNear && (
       <div style={{ position: 'absolute', inset: 0, opacity: 0.2 }}>
         <FloatingLines speed={1.0} opacity={0.2} />
       </div>
+      )}
       <motion.div
         className="section-container"
         initial={{ opacity: 0 }}

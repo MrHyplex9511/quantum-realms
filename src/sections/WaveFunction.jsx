@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
 import Plasma from '../components/reactbits/Plasma'
+import useInView from '../hooks/useInView'
 
 const keyframesStyle = `
 @keyframes cloudPulse {
@@ -98,12 +99,16 @@ export default function WaveFunction() {
     { color: '#cccccc', size: 5, anim: 'particleOrbit2', delay: '0.1s' },
   ]
 
+  const [sectionRef, sectionNear] = useInView(0, '1000px');
+
   return (
-    <section id="wave-function" style={{ position: 'relative', overflow: 'hidden' }}>
+    <section id="wave-function" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden' }}>
       <style>{keyframesStyle}</style>
+      {sectionNear && (
       <div style={{ position: 'absolute', inset: 0, opacity: 0.15 }}>
         <Plasma color="#ffffff" speed={0.8} opacity={0.15} />
       </div>
+      )}
       <motion.div
         className="section-container"
         initial={{ opacity: 0 }}

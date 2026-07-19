@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import TunnelCanvas from '../components/TunnelCanvas'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
+import useInView from '../hooks/useInView'
 
 const cardStyle = {
   display: 'grid',
@@ -23,8 +24,9 @@ const factStyle = {
 }
 
 export default function Tunneling() {
+  const [sectionRef, sectionNear] = useInView(0, '1000px');
   return (
-    <section id="tunneling" style={{ position: 'relative', overflow: 'hidden' }}>
+    <section id="tunneling" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden' }}>
       <motion.div
         className="section-container"
         initial={{ opacity: 0 }}
@@ -54,7 +56,7 @@ export default function Tunneling() {
           transition={{ delay: 0.4, duration: 0.5 }}
           style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}
         >
-          <TunnelCanvas height="600px" />
+          {sectionNear && <TunnelCanvas height="600px" />}
         </motion.div>
 
         <div style={cardStyle}>

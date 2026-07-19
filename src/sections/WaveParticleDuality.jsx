@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import LineWaves from '../components/reactbits/LineWaves'
 import QuantumCard from '../components/QuantumCard'
 import AnimatedText from '../components/AnimatedText'
+import useInView from '../hooks/useInView'
 
 const cardStyle = {
   display: 'grid',
@@ -11,11 +12,14 @@ const cardStyle = {
 }
 
 export default function WaveParticleDuality() {
+  const [sectionRef, sectionNear] = useInView(0, '1000px');
   return (
-    <section id="wave-particle" style={{ position: 'relative', overflow: 'hidden' }}>
+    <section id="wave-particle" ref={sectionRef} style={{ position: 'relative', overflow: 'hidden' }}>
+      {sectionNear && (
       <div style={{ position: 'absolute', inset: 0, opacity: 0.4 }}>
         <LineWaves brightness={0.15} />
       </div>
+      )}
       <motion.div
         className="section-container"
         initial={{ opacity: 0 }}
